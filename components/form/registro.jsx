@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
 
@@ -24,26 +24,32 @@ const Registro = () => {
 
     const handleRegistro = async () => {
         if (correo && contraseña) {
-            try {
-                const response = await Axios.post(`http://localhost:3002/api/register`, {
-                    email: correo,
-                    password: contraseña,
-                  });
-                //   console.log(response,"😒😒")
-                  if (response.data.error === "correo_existe") {
-                    alert("Esta dirección de correo ya está en uso. Por favor, elige otra.")
-                  } else {
-                    alert("¡Registro exitoso!");
+            if (!validarCorreo(correo)) {
+                alert('El correo no es válido');
+            } else {
+                try {
+                    const response = await Axios.post(`http://localhost:3002/api/register`, {
+                        email: correo,
+                        password: contraseña,
+                    });
+                    if (response.data.error === "correo_existe") {
+                        alert("Esta dirección de correo ya está en uso. Por favor, elige otra.")
+                    } else {
+                        alert("¡Registro exitoso!");
+                        // Limpiar los campos después de un registro exitoso
+                        setCorreo('');
+                        setContraseña('');
+                    }
+                } catch (error) {
+                    console.log("❤️❤️❤️", error);
                 }
-            } catch (error) {
-                console.log("❤️❤️❤️", error);
             }
         } else if (!correo && !contraseña) {
-            alert("ingresar correo y contraseña")
+            alert("Ingresa correo y contraseña");
         } else if (!correo) {
-            alert("ingresar correo")
+            alert("Ingresa correo");
         } else if (!contraseña) {
-            alert("ingresar contraseña")
+            alert("Ingresa contraseña");
         }
     };
 

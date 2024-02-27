@@ -1,36 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const Home = ({ navigation }) => {
+  useEffect(() => {
+    // Verificar si hay un token almacenado en AsyncStorage
+    const checkAuthentication = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        // Si hay un token, el usuario está autenticado, redirige a la pantalla Home
+        if (token) {
+          navigation.replace('Home');
+        } else {
+          // Si no hay un token, el usuario no está autenticado, redirige a la pantalla de inicio de sesión
+          navigation.replace('Login');
+        }
+      } catch (error) {
+        console.error('Error al verificar la autenticación', error);
+      }
+    };
 
+    // Llama a la función para verificar la autenticación al cargar el componente
+    checkAuthentication();
+  }, [navigation]);
 
-    // const handleIniciar = async () => {
-    //     if (correo && contraseña) {
-    //         try {
-    //             await AsyncStorage.setItem('correo', correo);
-    //             await AsyncStorage.setItem('contraseña', contraseña);
-    //             // Redirigir al usuario a la pantalla "Home"
-    //             navigation.navigate('Home');
-    //         } catch (error) {
-    //             console.log('Error al guardar los datos:', error);
-    //         }
-    //     } else if (!correo && !contraseña) {
-    //         alert('Por favor ingrese contraseña y correo');
-    //     } else if (!contraseña) {
-    //         alert('Ingrese contraseña');
-    //     } else if (!correo) {
-    //         alert('Ingrese correo');
-    //     }
-    // };
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Error al eliminar el token', error);
+    }
+  };
 
-export default function Home() {
   return (
     <View style={styles.container}>
       <Text>Bienvenidos!</Text>
-      <StatusBar style="auto" />
+      <Button title="Salir" onPress={handleLogout} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -40,3 +49,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default Home;

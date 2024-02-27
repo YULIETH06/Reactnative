@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// prop que proporciona funciones y propiedades relacionadas con la navegación entre pantallas
 const Login = ({ navigation }) => {
     const [correo, setCorreo] = useState('');
     const [contraseña, setContraseña] = useState('');
     const [correoError, setCorreoError] = useState('');
 
+    //expresión regular para validar el correo//
     const validarCorreo = (correo) => {
         const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return correoRegex.test(correo);
@@ -29,13 +32,13 @@ const Login = ({ navigation }) => {
                     email: correo,
                     password: contraseña,
                 });
-                console.log(response, "😒😒");
                 if (response.data.message === "Inicio de sesión exitoso") {
                     alert("Inicio de sesión exitoso");
                 }
+                const token = response.data.token;
+                await AsyncStorage.setItem('token',token);
                 navigation.navigate('Home');
             } catch (error) {
-                console.log("❤️❤️❤️", error);
                 if (error.response && error.response.status === 401) {
                     alert("Contraseña incorrecta");
                 } else if (error.response && error.response.status === 404) {
