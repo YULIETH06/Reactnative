@@ -3,12 +3,15 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modalcomponente from '../modal/modal';
 
 // prop que proporciona funciones y propiedades relacionadas con la navegación entre pantallas
 const Login = ({ navigation }) => {
     const [correo, setCorreo] = useState('');
     const [contraseña, setContraseña] = useState('');
     const [correoError, setCorreoError] = useState('');
+    const [modalErrorVisible, setModalErrorVisible] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState("");
 
     //expresión regular para validar el correo//
     const validarCorreo = (correo) => {
@@ -28,35 +31,49 @@ const Login = ({ navigation }) => {
     const handleLogin = async () => {
         if (correo && contraseña) {
             if (!validarCorreo(correo)) {
-                alert("El correo no es válido");
+                setModalErrorVisible(true);
+                setModalMensaje("El correo no es válido")
             } else {
                 try {
                     const response = await Axios.post(`http://localhost:3002/api/login`, {
                         email: correo,
                         password: contraseña,
                     });
+
                     if (response.data.message === "Inicio de sesión exitoso") {
-                        alert("Inicio de sesión exitoso");
+                        setModalErrorVisible(true);
+                        setModalMensaje("Inicio de sesión exitoso")
                         setCorreo('');
                         setContraseña('');
                     }
+
                     const token = response.data.token;
                     await AsyncStorage.setItem('token', token);
                     navigation.navigate('Home');
                 } catch (error) {
                     if (error.response && error.response.status === 401) {
-                        alert("Contraseña incorrecta");
+                        setModalErrorVisible(true);
+                        setModalMensaje(error.response.data.message,"uuuu bobolon")
+
+                        // Manejar el caso específico de cuenta bloqueada
+                        if (error.response.data.message.includes("bloqueada")) {
+                            // Puedes redirigir al usuario o mostrar un mensaje específico
+                        }
                     } else if (error.response && error.response.status === 404) {
-                        alert("El correo electrónico no está registrado.");
+                        setModalErrorVisible(true);
+                        setModalMensaje("El correo electrónico no está registrado.")
                     }
                 }
             }
         } else if (!correo && !contraseña) {
-            alert("Ingresar correo y contraseña");
+            setModalErrorVisible(true);
+            setModalMensaje("Ingresar correo y contraseña")
         } else if (!correo) {
-            alert("Ingresar correo");
+            setModalErrorVisible(true);
+            setModalMensaje("Ingresar correo")
         } else if (!contraseña) {
-            alert("Ingresar contraseña");
+            setModalErrorVisible(true);
+            setModalMensaje("Ingresar contraseña")
         }
     };
 
@@ -67,6 +84,7 @@ const Login = ({ navigation }) => {
             <TextInput
                 placeholder="correo"
                 style={styles.textInput}
+                maxLength={30}
                 onChangeText={handleCorreoChange}
             />
             {correoError !== '' && (
@@ -76,6 +94,7 @@ const Login = ({ navigation }) => {
                 placeholder="contraseña"
                 secureTextEntry={true}
                 style={styles.textInput}
+                maxLength={20}
                 onChangeText={(text) => setContraseña(text)}
             />
             <TouchableOpacity style={styles.containerButton} onPress={handleLogin}>
@@ -91,6 +110,9 @@ const Login = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Registro')}>
                 <Text style={styles.LinkText}>Registrarse</Text>
             </TouchableOpacity>
+            {modalErrorVisible && (
+        <Modalcomponente errorTextModal={modalMensaje} estado={modalErrorVisible} setEstado={setModalErrorVisible} />
+      )}
         </View>
     );
 };

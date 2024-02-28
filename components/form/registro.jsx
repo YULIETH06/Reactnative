@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
+import Modalcomponente from '../modal/modal';
 
 const Registro = () => {
   const [correo, setCorreo] = useState('');
@@ -9,9 +10,12 @@ const Registro = () => {
   const [correoError, setCorreoError] = useState('');
   const [mayusculaError, setMayusculaError] = useState('');
   const [minusculaError, setMinusculaculaError] = useState('');
+  const [numeroError, setNumeroError] = useState('');
   const [caracterEspecialError, setCaracterEspecialError] = useState('');
   const [caracterMinimosError, setCaracterMinimosError] = useState('');
   const [contraseñaError, setContraseñaError] = useState('');
+  const [modalErrorVisible, setModalErrorVisible] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState("");
 
   const validarCorreo = (correo) => {
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,6 +40,10 @@ const Registro = () => {
     const regex = /^(?=.*[A-Z])/;
     return regex.test(contraseña);
   };
+  const validarNumero = (contraseña) => {
+    const regex = /^(?=.*[0-9])/;
+    return regex.test(contraseña);
+  };
 
   const validarCaracteresMinimos = (contraseña) => {
     const regex = /^.{8,}$/;
@@ -52,6 +60,7 @@ const Registro = () => {
 
     const cumpleContraseña = validarContraseña(text);
     const cumpleMayuscula = validarMayuscula(text);
+    const cumpleNumero = validarNumero(text);
     const cumpleMinuscula = validarMinuscula(text);
     const cumpleCaracterMinimos = validarCaracteresMinimos(text);
     const cumpleCaracterEspecial = validarCaracterEspecial(text);
@@ -74,6 +83,12 @@ const Registro = () => {
       setMinusculaculaError('Usar minuscula');
     } else {
       setMinusculaculaError('');
+    }
+
+    if (text && !cumpleNumero) {
+      setNumeroError('Usar numero');
+    } else {
+      setNumeroError('');
     }
 
     if (text && !cumpleCaracterEspecial) {
@@ -101,11 +116,11 @@ const Registro = () => {
   const handleRegistro = async () => {
     if (correo && contraseña) {
       if (!validarCorreo(correo)) {
-        alert('El correo no es válido');
+        setModalErrorVisible(true);
+        setModalMensaje('El correo no es válido')
       } else if (!validarContraseña(contraseña)) {
-        alert(
-          'La contraseña no es válida'
-          );
+        setModalErrorVisible(true);
+        setModalMensaje('La contraseña no es válida')
       }  else {
         try {
           const response = await Axios.post(`http://localhost:3002/api/register`, {
@@ -113,9 +128,11 @@ const Registro = () => {
             password: contraseña,
           });
           if (response.data.error === 'correo_existe') {
-            alert('Esta dirección de correo ya está en uso. Por favor, elige otra.');
+            setModalErrorVisible(true);
+            setModalMensaje('Esta dirección de correo ya está en uso. Por favor, elige otra.')
           } else {
-            alert('¡Registro exitoso!');
+            setModalErrorVisible(true);
+            setModalMensaje('¡Registro exitoso!')
             // Limpiar los campos después de un registro exitoso
             setCorreo('');
             setContraseña('');
@@ -125,11 +142,14 @@ const Registro = () => {
         }
       }
     } else if (!correo && !contraseña) {
-      alert('Ingresa correo y contraseña');
+      setModalErrorVisible(true);
+      setModalMensaje('Ingresa correo y contraseña');
     } else if (!correo) {
-      alert('Ingresa correo');
+      setModalErrorVisible(true);
+      setModalMensaje('Ingresa correo');
     } else if (!contraseña) {
-      alert('Ingresa contraseña');
+      setModalErrorVisible(true);
+      setModalMensaje('Ingresa contraseña')
     }
   };
 
@@ -141,6 +161,7 @@ const Registro = () => {
         placeholder="Correo"
         style={styles.textInput}
         onChangeText={handleCorreoChange}
+        maxLength={30}
       />
       {correoError !== '' && (
         <Text style={styles.errorText}>{correoError}</Text>
@@ -150,6 +171,7 @@ const Registro = () => {
         secureTextEntry={true}
         style={styles.textInput}
         onChangeText={handleContraseñaChange}
+        maxLength={20}
       />
       {/* {contraseñaError !== '' && (
         <Text style={styles.errorText}>{contraseñaError}</Text>
@@ -162,6 +184,9 @@ const Registro = () => {
       )}
       {minusculaError !== '' && (
         <Text style={styles.errorText}>{minusculaError}</Text>
+      )}
+      {numeroError !== '' && (
+        <Text style={styles.errorText}>{numeroError}</Text>
       )}
       {caracterEspecialError !== '' && (
         <Text style={styles.errorText}>{caracterEspecialError}</Text>
@@ -176,6 +201,9 @@ const Registro = () => {
           <Text style={styles.textButton}>Registrar</Text>
         </LinearGradient>
       </TouchableOpacity>
+      {modalErrorVisible && (
+        <Modalcomponente errorTextModal={modalMensaje} estado={modalErrorVisible} setEstado={setModalErrorVisible} />
+      )}
     </View>
   );
 };
