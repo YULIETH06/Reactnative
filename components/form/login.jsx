@@ -27,22 +27,28 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         if (correo && contraseña) {
-            try {
-                const response = await Axios.post(`http://localhost:3002/api/login`, {
-                    email: correo,
-                    password: contraseña,
-                });
-                if (response.data.message === "Inicio de sesión exitoso") {
-                    alert("Inicio de sesión exitoso");
-                }
-                const token = response.data.token;
-                await AsyncStorage.setItem('token',token);
-                navigation.navigate('Home');
-            } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    alert("Contraseña incorrecta");
-                } else if (error.response && error.response.status === 404) {
-                    alert("El correo electrónico no está registrado.");
+            if (!validarCorreo(correo)) {
+                alert("El correo no es válido");
+            } else {
+                try {
+                    const response = await Axios.post(`http://localhost:3002/api/login`, {
+                        email: correo,
+                        password: contraseña,
+                    });
+                    if (response.data.message === "Inicio de sesión exitoso") {
+                        alert("Inicio de sesión exitoso");
+                        setCorreo('');
+                        setContraseña('');
+                    }
+                    const token = response.data.token;
+                    await AsyncStorage.setItem('token', token);
+                    navigation.navigate('Home');
+                } catch (error) {
+                    if (error.response && error.response.status === 401) {
+                        alert("Contraseña incorrecta");
+                    } else if (error.response && error.response.status === 404) {
+                        alert("El correo electrónico no está registrado.");
+                    }
                 }
             }
         } else if (!correo && !contraseña) {
@@ -53,8 +59,6 @@ const Login = ({ navigation }) => {
             alert("Ingresar contraseña");
         }
     };
-
-
 
     return (
         <View style={styles.container}>
@@ -85,12 +89,11 @@ const Login = ({ navigation }) => {
                 </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Registro')}>
-                <Text>Registrarse</Text>
+                <Text style={styles.LinkText}>Registrarse</Text>
             </TouchableOpacity>
         </View>
     );
 };
-
 export default Login;
 
 const styles = StyleSheet.create({
@@ -140,5 +143,9 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 12,
         marginTop: 5,
+    },
+    LinkText: {
+        fontSize: 20,
+        marginTop: 10,
     },
 }); 
