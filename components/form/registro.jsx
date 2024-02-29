@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
 import Modalcomponente from '../modal/modal';
 
-const Registro = () => {
+const Registro = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [correoError, setCorreoError] = useState('');
@@ -203,6 +203,9 @@ const Registro = () => {
           <Text style={styles.textButton}>Registrar</Text>
         </LinearGradient>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.LinkText}>Inicio sesión</Text>
+            </TouchableOpacity>
       {modalErrorVisible && (
         <Modalcomponente errorTextModal={modalMensaje} estado={modalErrorVisible} setEstado={setModalErrorVisible} />
       )}
@@ -259,4 +262,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
+  LinkText: {
+    fontSize: 20,
+    marginTop: 10,
+},
 });
