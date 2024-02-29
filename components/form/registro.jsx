@@ -162,6 +162,7 @@ const Registro = () => {
         style={styles.textInput}
         onChangeText={handleCorreoChange}
         maxLength={30}
+        value={correo}
       />
       {correoError !== '' && (
         <Text style={styles.errorText}>{correoError}</Text>
@@ -169,6 +170,7 @@ const Registro = () => {
       <TextInput
         placeholder="Contraseña"
         secureTextEntry={true}
+        value={contraseña}
         style={styles.textInput}
         onChangeText={handleContraseñaChange}
         maxLength={20}

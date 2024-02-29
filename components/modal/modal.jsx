@@ -1,27 +1,36 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Modal from 'react-native-modal';
 
 const Modalcomponente = ({errorTextModal,estado,setEstado}) => {
   return (
     <>
     {estado && 
     <View style={styles.container}>
-      <Modal isVisible={estado} onBackdropPress={() => setEstado(!estado)}>
         <View style={styles.modalContainer}>
           <Text style={styles.modalText}>{errorTextModal}</Text>
-          <TouchableOpacity onBackdropPress={() => setEstado(!estado)}>
+          <TouchableOpacity onPress={() => setEstado(!estado)}>
             <Text style={styles.modalCloseButton}>Cerrar</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
     </View>
-}
+    }
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.551)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    flex: 1,
+  },
   modalContainer: {
     backgroundColor: '#fff',
     padding: 20,

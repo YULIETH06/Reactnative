@@ -3,15 +3,43 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation }) => {
+  // useEffect(() => {
+  //   // Verificar si hay un token almacenado en AsyncStorage
+  //   const checkAuthentication = async () => {
+  //     try {
+  //       const token = await AsyncStorage.getItem('token');
+  //       // Si hay un token, el usuario está autenticado, redirige a la pantalla Home
+  //       if (token) {
+  //         navigation.replace('Home');
+  //       } else {
+  //         // Si no hay un token, el usuario no está autenticado, redirige a la pantalla de inicio de sesión
+  //         navigation.replace('Login');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error al verificar la autenticación', error);
+  //     }
+  //   };
+
+  //   // Llama a la función para verificar la autenticación al cargar el componente
+  //   checkAuthentication();
+  // }, [navigation]);
+
+  // const handleLogout = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('token');
+  //     navigation.navigate('Login');
+  //   } catch (error) {
+  //     console.error('Error al eliminar el token', error);
+  //   }
+  // };
+
   useEffect(() => {
     // Verificar si hay un token almacenado en AsyncStorage
     const checkAuthentication = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        // Si hay un token, el usuario está autenticado, redirige a la pantalla Home
-        if (token) {
-          navigation.replace('Home');
-        } else {
+        // Si hay un token, el usuario está autenticado, permanece en la pantalla Home
+        if (!token) {
           // Si no hay un token, el usuario no está autenticado, redirige a la pantalla de inicio de sesión
           navigation.replace('Login');
         }
@@ -27,7 +55,7 @@ const Home = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
-      navigation.navigate('Login');
+      navigation.replace('Login');
     } catch (error) {
       console.error('Error al eliminar el token', error);
     }

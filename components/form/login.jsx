@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Axios from 'axios';
@@ -12,6 +12,21 @@ const Login = ({ navigation }) => {
     const [correoError, setCorreoError] = useState('');
     const [modalErrorVisible, setModalErrorVisible] = useState(false);
   const [modalMensaje, setModalMensaje] = useState("");
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          navigation.replace('Home');
+        }
+      } catch (error) {
+        console.error('Error al verificar el token', error);
+      }
+    };
+
+    checkToken();
+  }, [navigation]);
 
     //expresión regular para validar el correo//
     const validarCorreo = (correo) => {
@@ -83,6 +98,7 @@ const Login = ({ navigation }) => {
             <Text style={styles.subTitle}>Iniciar sesión en su cuenta</Text>
             <TextInput
                 placeholder="correo"
+                value={correo}
                 style={styles.textInput}
                 maxLength={30}
                 onChangeText={handleCorreoChange}
@@ -92,6 +108,7 @@ const Login = ({ navigation }) => {
             )}
             <TextInput
                 placeholder="contraseña"
+                value={contraseña}
                 secureTextEntry={true}
                 style={styles.textInput}
                 maxLength={20}
