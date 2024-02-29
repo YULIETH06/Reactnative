@@ -54,14 +54,10 @@ const Login = ({ navigation }) => {
                         email: correo,
                         password: contraseña,
                     });
-
                     if (response.data.message === "Inicio de sesión exitoso") {
-                        setModalErrorVisible(true);
-                        setModalMensaje("Inicio de sesión exitoso")
                         setCorreo('');
                         setContraseña('');
                     }
-
                     const token = response.data.token;
                     await AsyncStorage.setItem('token', token);
                     navigation.navigate('Home');
@@ -69,14 +65,13 @@ const Login = ({ navigation }) => {
                     if (error.response && error.response.status === 401) {
                         setModalErrorVisible(true);
                         setModalMensaje(error.response.data.message,"uuuu bobolon")
-
-                        // Manejar el caso específico de cuenta bloqueada
-                        if (error.response.data.message.includes("bloqueada")) {
-                            // Puedes redirigir al usuario o mostrar un mensaje específico
-                        }
                     } else if (error.response && error.response.status === 404) {
                         setModalErrorVisible(true);
                         setModalMensaje("El correo electrónico no está registrado.")
+                    } else if (error.response.data.message.includes("bloqueada")) {
+                        // Puedes redirigir al usuario o mostrar un mensaje específico
+                        setModalErrorVisible(true);
+                        setModalMensaje(error.response.data.message,"bloqueada")
                     }
                 }
             }
